@@ -6,7 +6,7 @@
 
 ## 下载
 
-前往 **[Releases 下载页面](https://github.com/purkn/Sneakkkkk/releases/latest)**，选择你的系统。首次自动构建完成前，下载页面可能暂时没有版本。
+前往 **[Releases 下载页面](https://github.com/purkn/Sneakkkkk/releases)**，选择你的系统。首次自动构建完成前，下载页面可能暂时没有版本。
 
 | 下载文件 | 系统 | 使用方式 |
 | --- | --- | --- |
