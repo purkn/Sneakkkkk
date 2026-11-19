@@ -1,0 +1,63 @@
+name: Build and publish apps
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ['v*']
+permissions:
+  contents: read
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run pack:win
+      - shell: pwsh
+        run: Compress-Archive -Path dist/Sneakkkkk-win32-x64 -DestinationPath Sneakkkkk-Windows-x64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: Sneakkkkk-Windows-x64.zip
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: chmod +x build.sh && ./build.sh
+      - run: cp LICENSE build/Sneakkkkk.app/Contents/Resources/LICENSE && codesign --force --deep --sign - build/Sneakkkkk.app
+      - run: ditto -c -k --norsrc --keepParent build/Sneakkkkk.app Sneakkkkk-macOS-universal.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: Sneakkkkk-macOS-universal.zip
+  release:
+    needs: [windows, macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Publish downloadable preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          TAG="v0.2.0-preview"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then TAG="${GITHUB_REF#refs/tags/}"; fi
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "Sneakkkkk $TAG" --notes "免费使用、禁止销售，详见仓库 LICENSE。macOS 未公证；Windows 为待真机验证的移植预览版。解压 Windows 包的全部文件后运行 exe。" --prerelease
+          fi
+          sha256sum artifacts/*.zip > artifacts/SHA256SUMS.txt
+          gh release upload "$TAG" artifacts/* --clobber
