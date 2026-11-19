@@ -1,0 +1,17 @@
+{
+  "name": "sneakkkkk",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Local desktop quick notes",
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "start": "node scripts/prepare-assets.cjs && electron .",
+    "pack:win": "node scripts/prepare-assets.cjs && electron-packager . Sneakkkkk --platform=win32 --arch=x64 --out=dist --overwrite --ignore=dist --ignore=Sources --ignore=.github --ignore=build",
+    "pack:mac": "node scripts/prepare-assets.cjs && electron-packager . Sneakkkkk --platform=darwin --arch=arm64,x64 --out=dist --overwrite --ignore=dist --ignore=Sources --ignore=.github --ignore=build"
+  },
+  "devDependencies": {
+    "electron": "45.4.1",
+    "@electron/packager": "20.3.0"
+  },
+  "license": "SEE LICENSE IN LICENSE"
+}
