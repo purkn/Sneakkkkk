@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.DS_Store
+*.log
+.env*
+notes.json
+drafts.json
+settings.json
+*-draft.txt
+history-*.txt
+append-*.txt
