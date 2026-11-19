@@ -1,0 +1,1 @@
+const {contextBridge,ipcRenderer}=require('electron');contextBridge.exposeInMainWorld('desktop',{invoke:(a,b)=>ipcRenderer.invoke('desktop',a,b)});contextBridge.exposeInMainWorld('webkit',{messageHandlers:{mellow:{postMessage:b=>ipcRenderer.invoke('bridge',b)}}});
